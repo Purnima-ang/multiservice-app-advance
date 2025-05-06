@@ -24,7 +24,7 @@ This project is a simple multi-service application demonstrating Docker containe
 
 2.  **Build and run the application using Docker Compose:**
     ```bash
-    docker-compose up --build -d
+    docker compose up --build -d
     ```
     *   `--build`: Builds the web service image before starting the containers.
     *   `-d`: Runs the containers in detached mode (in the background).
@@ -43,14 +43,14 @@ This project is a simple multi-service application demonstrating Docker containe
 
 4.  **Stop the application:**
     ```bash
-    docker-compose down
+    docker compose down
     ```
     This will stop and remove the containers, but the `redis_data` volume will persist.
 
 5.  **Clean up (optional):**
     To remove the named volume and all images:
     ```bash
-    docker-compose down -v --rmi all
+    docker compose down -v --rmi all
     ```
 
 ## CI/CD Pipeline (GitHub Actions)
