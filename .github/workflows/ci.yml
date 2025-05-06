@@ -1,0 +1,69 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main # Trigger on push to the main branch
+  pull_request:
+    branches:
+      - main # Trigger on pull requests to the main branch
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3 # Checkout the repository code
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2 # Set up Buildx for improved building capabilities
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }} # Use GitHub secrets for credentials
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push web service image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./web # Build from the ./web directory
+          push: true # Push the image to the registry
+          tags: |
+            your-dockerhub-username/my-web-service:latest
+            your-dockerhub-username/my-web-service:${{ github.sha }} # Tag with commit SHA for versioning
+
+      - name: Run tests (using Docker Compose)
+        run: |
+          docker-compose up -d redis # Start only the redis service in detached mode
+          # Add commands to run your web service tests here.
+          # These tests should ideally interact with the running redis service.
+          # For a simple example, you might run a Python script that uses the 'redis' library
+          # to connect to 'redis:6379' and perform basic operations.
+          # Example (replace with your actual test command):
+          # python -m unittest discover tests/
+
+          # Bring down the services after tests (optional, but good practice)
+          # docker-compose down
+
+      # Example deployment step (replace with your actual deployment method)
+      # This is a placeholder and will depend on where you are deploying.
+      # For a simple example, you might use SSH to connect to a server and run docker-compose.
+      - name: Deploy to server (Example using SSH)
+        # This step requires setting up SSH keys as GitHub secrets
+        # and configuring your server for SSH access.
+        # This is a complex topic on its own and simplified here.
+        # uses: appleboy/ssh-action@master
+        # with:
+        #   host: ${{ secrets.SSH_HOST }}
+        #   username: ${{ secrets.SSH_USERNAME }}
+        #   key: ${{ secrets.SSH_KEY }}
+        #   script: |
+        #     cd /path/to/your/app # Navigate to your application directory on the server
+        #     docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+        #     docker-compose pull web # Pull the latest web image
+        #     docker-compose up -d --no-deps web # Start or update the web service, avoiding restarting redis
+        run: |
+          echo "Deployment step placeholder. Implement your deployment logic here."
+          echo "Common methods: SSH to server and run docker-compose, use a deployment tool like Capistrano or Ansible, or use an orchestration platform like Kubernetes."

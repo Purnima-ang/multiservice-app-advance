@@ -1,0 +1,26 @@
+services:
+  web:
+    build: ./web # Build the image using the Dockerfile in the ./web directory
+    ports:
+      - "8000:8000" # Map host port 5000 to container port 5000
+    depends_on:
+      - redis # Ensure redis starts before the web service
+    environment:
+      # Pass Redis connection details to the web service
+      REDIS_HOST: redis # Use the service name 'redis' for hostname resolution
+      REDIS_PORT: 6379
+    volumes:
+      # Optional: Mount the web code for easier development (comment out for production builds)
+      - ./web:/app  # <-- Comment out the hyphen and the mapping
+
+  redis:
+    image: redis:latest # Use the official Redis image from Docker Hub
+    ports:
+      # Optional: Expose Redis port if you need to access it from the host (not required for web service)
+      - "6379:6379"
+    volumes:
+      - redis_data:/data # Persist Redis data to the named volume
+
+# This 'volumes:' key should be at the same level as 'services:'
+volumes:
+  redis_data: # Define the named volume

@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.env
+
+# Node.js
+node_modules/
+
+# Docker
+*.swp
+*.swo
+
+# Logs
+logs/
+
+# CI/CD secrets (don't commit these)
+.env.ci
